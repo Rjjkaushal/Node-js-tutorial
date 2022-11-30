@@ -1,18 +1,42 @@
+const confg= require('config');
+
+//debugger
+const startupDebugger=require('debug')('app:startup');
+const dbdebugger= require('debug')('app:db');
+
 const Joi = require('joi');
 const logger= require('./logger');
 const express= require('express');
+const  helmet  = require('helmet');
+const morgan = require('morgan');
 const app= express();
+
+console.log(`NODE_ENV:${process.NODE_ENV}`);
+console.log(`app: ${app.get('env')}`);
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(express.static('public'));
+app.use(helmet());
 
-app.use(logger)
+
+//configuration
+console.log('Application name: '+config.get('name'));
+console.log('Application name: '+config.get('mail.host'));
+
+if(app.get('env')==='development'){
+   app.use(morgan('tiny'));
+   // console.log('morgan is enabled');
+   startupDebugger('morgan enabled');
+}
+
+app.use(logger);
 //custom middleware function
 app.use((req,res, next)=>{
     console.log('authenticating.....');
     next(); 
 });
+
 // app.get()
 // app.post()
 // app.put()
